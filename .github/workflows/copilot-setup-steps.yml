@@ -1,0 +1,39 @@
+name: "Copilot Setup Steps"
+
+on:
+  # Allow manual testing through the repository's "Actions" tab
+  workflow_dispatch: {}
+  # Automatically run the setup steps when an associated workflow is changed.
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/actions/setup-codeql-environment/action.yml
+      - qlt.conf.json
+      - scripts/install-codeql-packs.sh
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+      - .github/actions/setup-codeql-environment/action.yml
+      - qlt.conf.json
+      - scripts/install-codeql-packs.sh
+
+jobs:
+  # The job MUST be called `copilot-setup-steps` or it will not be picked up by Copilot.
+  copilot-setup-steps:
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Copilot Setup - Checkout code
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v6
+
+      - name: Copilot Setup - Setup CodeQL environment
+        uses: ./.github/actions/setup-codeql-environment
+
+      - name: Copilot Setup - Install CodeQL workspace packs
+        shell: bash
+        run: ./scripts/install-codeql-packs.sh
